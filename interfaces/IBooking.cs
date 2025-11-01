@@ -8,9 +8,12 @@ namespace ProjetcGit.interfaces
 {
     public interface IBooking
     {
-        void BookRoom(INumber room, int nights);
-        void CancelBooking();
-        void ChangeBooking(INumber newRoom, int nights);
+        INumber Room { get; }
+        string GuestName { get; }
+        DateTime StartDate { get; }
+        DateTime EndDate { get; }
+
         decimal CalculateTotal();
+        bool Overlaps(DateTime start, DateTime end);
     }
 }
