@@ -10,6 +10,7 @@ namespace ProjetcGit
     {
         static void Main(string[] args)
         {
+            Console.WriteLine("Hello world!!!");
         }
     }
 }
