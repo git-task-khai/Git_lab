@@ -9,41 +9,44 @@ namespace ProjetcGit.Classes
 {
     public class Booking : IBooking
     {
-        private INumber room;
-        private int nights;
-        private bool isActive;
+        public INumber Room { get; set; }
+        public string GuestName { get; set; }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
 
-        public Booking(INumber room, int nights)
-        {
-            BookRoom(room, nights);
-        }
+        public Booking() { }
 
-        public void BookRoom(INumber room, int nights)
+        public Booking(INumber room, string guestName, DateTime start, DateTime end)
         {
-            this.room = room;
-            this.nights = nights;
-            this.room.SetAvailability(false);
-            isActive = true;
-            Console.WriteLine($"Номер {this.room.Id} забронирован на {this.nights} ночей.");
-        }
+            Room = room;
+            GuestName = guestName;
+            StartDate = start;
+            EndDate = end;
 
-        public void CancelBooking()
-        {
-            if (!this.isActive) return;
-            this.room.SetAvailability(true);
-            this.isActive = false;
-            Console.WriteLine($"Бронь на номер {this.room.Id} отменена.");
-        }
-
-        public void ChangeBooking(INumber newRoom, int nights)
-        {
-            CancelBooking();
-            BookRoom(newRoom, nights);
+            Room.SetAvailability(false);
         }
 
         public decimal CalculateTotal()
         {
-            return this.room.PricePerNight * this.nights;
+            int nights = (EndDate - StartDate).Days;
+            if (nights < 0) nights = 0;
+            return nights * Room.PricePerNight;
+        }
+
+        public bool Overlaps(DateTime start, DateTime end)
+        {
+            return StartDate < end && start < EndDate;
+        }
+
+        public void CancelBooking()
+        {
+            Room.SetAvailability(true);
+        }
+
+        public override string ToString()
+        {
+            return $"Гість: {GuestName}, Номер: {Room.Id} ({Room.Type}), " +
+                   $"{StartDate:dd.MM.yyyy} → {EndDate:dd.MM.yyyy}, Сума: {CalculateTotal()}";
         }
     }
 }

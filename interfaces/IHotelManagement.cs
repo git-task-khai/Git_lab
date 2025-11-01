@@ -9,8 +9,10 @@ namespace ProjetcGit.interfaces
     public interface IHotelManagement
     {
         void AddRoom(INumber room);
-        void CheckIn(string guestName, INumber room, int nights);
-        void CheckOut(string guestName);
         void ShowReport();
+
+        void BookRoom(string guestName, int roomId, DateTime start, DateTime end);
+        void CancelBooking(string guestName);
+        void ShowBookings();
     }
 }
