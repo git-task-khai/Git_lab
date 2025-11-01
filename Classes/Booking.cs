@@ -7,12 +7,20 @@ using System.Threading.Tasks;
 
 namespace ProjetcGit.Classes
 {
+    public enum BookingStatus
+    {
+        Reserved,
+        CheckedIn,
+        CheckedOut
+    }
+
     public class Booking : IBooking
     {
         public INumber Room { get; set; }
         public string GuestName { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        public BookingStatus Status { get; set; }
 
         public Booking() { }
 
@@ -22,6 +30,7 @@ namespace ProjetcGit.Classes
             GuestName = guestName;
             StartDate = start;
             EndDate = end;
+            Status = BookingStatus.Reserved;
 
             Room.SetAvailability(false);
         }
@@ -41,12 +50,25 @@ namespace ProjetcGit.Classes
         public void CancelBooking()
         {
             Room.SetAvailability(true);
+            Status = BookingStatus.CheckedOut;
+        }
+
+        public void CheckIn()
+        {
+            Status = BookingStatus.CheckedIn;
+            Room.SetAvailability(false);
+        }
+
+        public void CheckOut()
+        {
+            Status = BookingStatus.CheckedOut;
+            Room.SetAvailability(true);
         }
 
         public override string ToString()
         {
             return $"Гість: {GuestName}, Номер: {Room.Id} ({Room.Type}), " +
-                   $"{StartDate:dd.MM.yyyy} → {EndDate:dd.MM.yyyy}, Сума: {CalculateTotal()}";
+                   $"{StartDate:dd.MM.yyyy} → {EndDate:dd.MM.yyyy}, Статус: {Status}, Сума: {CalculateTotal():C}";
         }
     }
 }

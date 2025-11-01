@@ -102,5 +102,92 @@ namespace ProjetcGit.Classes
             JsonStorage.SaveToJson(rooms, roomsFile);
             JsonStorage.SaveToJson(bookings, bookingsFile);
         }
+
+        public void CheckInGuest()
+        {
+            Console.Write("Заселення по броні? (так/ні): ");
+            string choice = Console.ReadLine().ToLower();
+
+            if (choice == "так")
+            {
+                Console.Write("ID номера: ");
+                int roomId = int.Parse(Console.ReadLine());
+                var booking = bookings.FirstOrDefault(b => b.Room.Id == roomId &&
+                                                           b.StartDate <= DateTime.Today &&
+                                                           b.EndDate >= DateTime.Today &&
+                                                           b.Status == BookingStatus.Reserved);
+
+                if (booking == null)
+                {
+                    Console.WriteLine("Бронь на сьогодні не знайдено!");
+                    return;
+                }
+
+                Console.Write($"Підтвердити заселення гостя {booking.GuestName}? (так/ні): ");
+                if (Console.ReadLine().ToLower() == "так")
+                {
+                    booking.CheckIn();
+                    SaveData();
+                    Console.WriteLine($"Гість {booking.GuestName} заселений в номер {booking.Room.Id}");
+                }
+            }
+            else
+            {
+                Console.Write("Введіть ID номера: ");
+                int roomId = int.Parse(Console.ReadLine());
+                var room = rooms.FirstOrDefault(r => r.Id == roomId && r.IsAvailable);
+                if (room == null)
+                {
+                    Console.WriteLine("Номер недоступний!");
+                    return;
+                }
+
+                Console.Write("Ім’я гостя: ");
+                string guest = Console.ReadLine();
+                Console.Write("Дата виїзду (рррр-мм-дд): ");
+                DateTime end = DateTime.Parse(Console.ReadLine());
+
+                var booking = new Booking(room, guest, DateTime.Today, end);
+                booking.CheckIn();
+                bookings.Add(booking);
+                SaveData();
+
+                Console.WriteLine($"Гість {guest} заселений в номер {room.Id} з сьогодні до {end:dd.MM.yyyy}");
+            }
+        }
+
+        public void CheckOutGuest()
+        {
+            var todayGuests = bookings.Where(b => b.Status == BookingStatus.CheckedIn &&
+                                                  b.StartDate <= DateTime.Today &&
+                                                  b.EndDate >= DateTime.Today).ToList();
+            if (!todayGuests.Any())
+            {
+                Console.WriteLine("Сьогодні немає заселених гостей.");
+                return;
+            }
+
+            Console.WriteLine("Заселені сьогодні номери:");
+            foreach (var b in todayGuests)
+                Console.WriteLine($"{b.Room.Id}: {b.GuestName}");
+
+            Console.Write("Введіть ID номера для виселення: ");
+            int roomId = int.Parse(Console.ReadLine());
+
+            var booking = todayGuests.FirstOrDefault(b => b.Room.Id == roomId);
+            if (booking == null)
+            {
+                Console.WriteLine("Номер не знайдено.");
+                return;
+            }
+
+            Console.Write($"Підтвердити виселення гостя {booking.GuestName}? (так/ні): ");
+            if (Console.ReadLine().ToLower() == "так")
+            {
+                booking.CheckOut();
+                SaveData();
+                Console.WriteLine($"Гість {booking.GuestName} виселений. Сума до сплати: {booking.CalculateTotal():C}");
+            }
+        }
     }
 }

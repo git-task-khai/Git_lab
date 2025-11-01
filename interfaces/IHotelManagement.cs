@@ -14,5 +14,7 @@ namespace ProjetcGit.interfaces
         void BookRoom(string guestName, int roomId, DateTime start, DateTime end);
         void CancelBooking(string guestName);
         void ShowBookings();
+        void CheckInGuest();
+        void CheckOutGuest();
     }
 }

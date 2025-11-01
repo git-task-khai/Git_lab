@@ -28,7 +28,9 @@ namespace ProjetcGit
                 Console.WriteLine("3. Забронювати номер");
                 Console.WriteLine("4. Скасувати бронювання");
                 Console.WriteLine("5. Показати всі бронювання");
-                Console.WriteLine("6. Вийти");
+                Console.WriteLine("6. Заселити гостя");
+                Console.WriteLine("7. Виселити гостя");
+                Console.WriteLine("8. Вийти");
                 Console.Write("Оберіть дію: ");
 
                 string choice = Console.ReadLine();
@@ -57,6 +59,14 @@ namespace ProjetcGit
                         break;
 
                     case "6":
+                        hotel.CheckInGuest();
+                        break;
+
+                    case "7":
+                        hotel.CheckOutGuest();
+                        break;
+
+                    case "8":
                         Console.WriteLine("Завершення роботи...");
                         return;
 
