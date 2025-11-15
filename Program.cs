@@ -107,9 +107,6 @@ namespace ProjetcGit
             Console.Write("Дата заїзду (рррр-мм-дд): ");
             DateTime start = DateTime.Parse(Console.ReadLine());
 
-            //Console.Write("Дата виїзду (рррр-мм-дд): ");
-            //DateTime end = DateTime.Parse(Console.ReadLine());
-
             DateTime end;
             while (true)
             {
