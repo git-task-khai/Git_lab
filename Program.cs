@@ -99,14 +99,29 @@ namespace ProjetcGit
             Console.Write("Ім’я гостя: ");
             string guest = Console.ReadLine();
 
+            hotel.ShowReport();
+
             Console.Write("ID номера: ");
             int roomId = int.Parse(Console.ReadLine());
 
             Console.Write("Дата заїзду (рррр-мм-дд): ");
             DateTime start = DateTime.Parse(Console.ReadLine());
 
-            Console.Write("Дата виїзду (рррр-мм-дд): ");
-            DateTime end = DateTime.Parse(Console.ReadLine());
+            DateTime end;
+            while (true)
+            {
+                Console.Write("Дата виїзду (рррр-мм-дд): ");
+                end = DateTime.Parse(Console.ReadLine());
+
+                if (end < start)
+                {
+                    Console.WriteLine("Дата виїзду не може бути раніше дати заїзду. Спробуйте ще раз.");
+                }
+                else
+                {
+                    break;
+                }
+            }
 
             hotel.BookRoom(guest, roomId, start, end);
         }
