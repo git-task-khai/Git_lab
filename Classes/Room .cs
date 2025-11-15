@@ -29,7 +29,7 @@ namespace ProjetcGit.Classes
 
         public void ShowInfo()
         {
-            Console.WriteLine($"Номер {Id}: тип {Type}, ціна {PricePerNight}, доступний: {IsAvailable}");
+            Console.WriteLine($"Номер {Id}: тип {Type}, ціна {PricePerNight}");
         }
 
         public void SetAvailability(bool available)
