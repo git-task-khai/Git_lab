@@ -1,6 +1,4 @@
 ﻿using Microsoft.SqlServer.Server;
-using ProjetcGit.Classes;
-using ProjetcGit.interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using GitClassLibrary.interfaces;
 
 namespace ProjetcGit
 {
