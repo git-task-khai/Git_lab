@@ -9,20 +9,16 @@ namespace GitClassLibrary.Classes
 {
     public class HotelManagement : IHotelManagement
     {
+        private readonly IDataStorage storage;
         private List<INumber> rooms;
         private List<Booking> bookings;
-        private string roomsFile;
-        private string bookingsFile;
 
-        public HotelManagement(string roomsFile, string bookingsFile)
+        public HotelManagement(IDataStorage dataStorage)
         {
-            this.roomsFile = roomsFile;
-            this.bookingsFile = bookingsFile;
+            this.storage = dataStorage;
 
-            var loadedRooms = JsonStorage.LoadFromJson<List<Room>>(roomsFile);
-            rooms = loadedRooms?.Cast<INumber>().ToList() ?? new List<INumber>();
-            
-            bookings = JsonStorage.LoadFromJson<List<Booking>>(bookingsFile) ?? new List<Booking>();
+            rooms = storage.LoadRooms();
+            bookings = storage.LoadBookings();
         }
 
         public void AddRoom(INumber room)
@@ -77,6 +73,7 @@ namespace GitClassLibrary.Classes
                 return;
             }
 
+            booking.CancelBooking();
             bookings.Remove(booking);
             SaveData();
             Console.WriteLine($"Бронювання для {guestName} скасовано.");
@@ -94,15 +91,15 @@ namespace GitClassLibrary.Classes
             foreach (var b in bookings)
             {
                 Console.WriteLine($"Гість: {b.GuestName}, Номер: {b.Room.Id} ({b.Room.Type}), " +
-                                  $"з {b.StartDate:dd.MM.yyyy} до {b.EndDate:dd.MM.yyyy}, сума: {b.CalculateTotal()}");
+                                  $"з {b.StartDate:dd.MM.yyyy} до {b.EndDate:dd.MM.yyyy}, сума: {b.CalculateTotal():C}");
             }
             Console.WriteLine("---------------------------\n");
         }
 
         private void SaveData()
         {
-            JsonStorage.SaveToJson(rooms, roomsFile);
-            JsonStorage.SaveToJson(bookings, bookingsFile);
+            // Використовуємо ін'єктований об'єкт сховища.
+            storage.SaveData(rooms, bookings);
         }
 
         public void CheckInGuest()
@@ -113,7 +110,8 @@ namespace GitClassLibrary.Classes
             if (choice == "так")
             {
                 Console.Write("ID номера: ");
-                int roomId = int.Parse(Console.ReadLine());
+                if (!int.TryParse(Console.ReadLine(), out int roomId)) return;
+
                 var booking = bookings.FirstOrDefault(b => b.Room.Id == roomId &&
                                                            b.StartDate <= DateTime.Today &&
                                                            b.EndDate >= DateTime.Today &&
@@ -136,7 +134,8 @@ namespace GitClassLibrary.Classes
             else
             {
                 Console.Write("Введіть ID номера: ");
-                int roomId = int.Parse(Console.ReadLine());
+                if (!int.TryParse(Console.ReadLine(), out int roomId)) return;
+
                 var room = rooms.FirstOrDefault(r => r.Id == roomId && r.IsAvailable);
                 if (room == null)
                 {
@@ -147,7 +146,7 @@ namespace GitClassLibrary.Classes
                 Console.Write("Ім’я гостя: ");
                 string guest = Console.ReadLine();
                 Console.Write("Дата виїзду (рррр-мм-дд): ");
-                DateTime end = DateTime.Parse(Console.ReadLine());
+                if (!DateTime.TryParse(Console.ReadLine(), out DateTime end)) return;
 
                 var booking = new Booking(room, guest, DateTime.Today, end);
                 booking.CheckIn();
@@ -161,25 +160,24 @@ namespace GitClassLibrary.Classes
         public void CheckOutGuest()
         {
             var todayGuests = bookings.Where(b => b.Status == BookingStatus.CheckedIn &&
-                                                  b.StartDate <= DateTime.Today &&
-                                                  b.EndDate >= DateTime.Today).ToList();
+                                                   b.EndDate >= DateTime.Today).ToList();
             if (!todayGuests.Any())
             {
-                Console.WriteLine("Сьогодні немає заселених гостей.");
+                Console.WriteLine("Сьогодні немає заселених гостей, які заселені.");
                 return;
             }
 
-            Console.WriteLine("Заселені сьогодні номери:");
+            Console.WriteLine("Заселені номери:");
             foreach (var b in todayGuests)
                 Console.WriteLine($"{b.Room.Id}: {b.GuestName}");
 
             Console.Write("Введіть ID номера для виселення: ");
-            int roomId = int.Parse(Console.ReadLine());
+            if (!int.TryParse(Console.ReadLine(), out int roomId)) return;
 
             var booking = todayGuests.FirstOrDefault(b => b.Room.Id == roomId);
             if (booking == null)
             {
-                Console.WriteLine("Номер не знайдено.");
+                Console.WriteLine("Номер не знайдено серед заселених.");
                 return;
             }
 

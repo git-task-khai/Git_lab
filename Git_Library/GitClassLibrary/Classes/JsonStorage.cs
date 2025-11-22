@@ -10,7 +10,11 @@ namespace GitClassLibrary.Classes
         {
             try
             {
-                Directory.CreateDirectory(Path.GetDirectoryName(filePath));
+                string directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
 
                 var json = JsonSerializer.Serialize(data, new JsonSerializerOptions
                 {
@@ -25,22 +29,20 @@ namespace GitClassLibrary.Classes
             }
         }
 
-        public static T LoadFromJson<T>(string filePath)
+        public static T LoadFromJson<T>(string filePath) where T : new()
         {
             try
             {
                 if (!File.Exists(filePath))
-                    return Activator.CreateInstance<T>();
+                    return new T();
 
                 var json = File.ReadAllText(filePath);
-
-                return JsonSerializer.Deserialize<T>(json)
-                       ?? Activator.CreateInstance<T>();
+                return JsonSerializer.Deserialize<T>(json) ?? new T();
             }
             catch (Exception ex)
             {
                 Console.WriteLine("Ошибка при загрузке JSON: " + ex.Message);
-                return Activator.CreateInstance<T>();
+                return new T();
             }
         }
     }
