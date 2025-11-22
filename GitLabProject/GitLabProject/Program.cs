@@ -22,7 +22,8 @@ namespace ProjetcGit
             const string bookingsFile = @"D:\university\Git_Project\bin\Debug\bookings.json";
 
             Console.OutputEncoding = System.Text.Encoding.UTF8;
-            IHotelManagement hotel = new HotelManagement(roomsFile, bookingsFile);
+            IDataStorage storage = new JsonFileStorage(roomsFile, bookingsFile);
+            IHotelManagement hotel = new HotelManagement(storage);
 
             while (true)
             {
